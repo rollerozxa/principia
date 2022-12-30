@@ -1,0 +1,36 @@
+name: appimage-test
+
+on:
+  push:
+    paths:
+      - 'src/**'
+      - 'build-*/**'
+      - '.github/workflows/**.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'build-*/**'
+      - '.github/workflows/**.yml'
+
+jobs:
+  linux:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk2.0-dev libgl-dev libxss-dev libxxf86vm-dev libasound2-dev libudev-dev valgrind libcurl4-openssl-dev libpng-dev libjpeg-dev libfreetype6-dev libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-mixer-dev libsdl2-gfx-dev
+      - name: Build
+        run: |
+          cd build-linux/
+          ./autogen.sh
+          ./configure
+          ./go --silent --release
+          bash build-appimage.sh
+          
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Principia-x86_64.AppImage
+          path: build-linux/Principia-x86_64.AppImage
