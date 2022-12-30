@@ -27,6 +27,7 @@ jobs:
           ./autogen.sh
           ./configure
           ./go --silent --release
+          wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
           bash build-appimage.sh
           
       - name: Upload output as artifact
