@@ -5,6 +5,7 @@ execute_process(COMMAND git rev-parse --short HEAD
 	ERROR_QUIET)
 if(NOT VERSION_GITHASH)
 	set(VERSION_GITHASH "(none)")
+	message(FATAL_ERROR "Failed to determine Git commit hash.")
 else()
 	message(STATUS "*** Detected Git commit ${VERSION_GITHASH} ***")
 endif()
