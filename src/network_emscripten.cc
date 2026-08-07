@@ -540,4 +540,6 @@ int network::download_level(void *p) {
     return T_OK;
 }
 
+int network::download_level_list(void *p) { return 0; }
+
 #endif

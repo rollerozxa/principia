@@ -95,6 +95,7 @@ include_directories(
 
 file(GLOB SRCS CONFIGURE_DEPENDS
 	lib/GLAD/src/gl.c
+	lib/cjson/cJSON.c
 	lib/lua/*.c
 	lib/SDL_image/*.c
 )

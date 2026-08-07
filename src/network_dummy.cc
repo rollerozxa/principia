@@ -16,4 +16,6 @@ int network::register_user(void *p) { return 0; }
 int network::download_pkg(void *p) { return 0; }
 int network::download_level(void *p) { return 0; }
 
+int network::download_level_list(void *p) { return 0; }
+
 #endif

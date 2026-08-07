@@ -198,6 +198,9 @@ void ui::open_dialog(int num, void *data/*=0*/) {
         case DIALOG_PROMPT_SETTINGS:
             UiPromptSettings::open();
             break;
+        case DIALOG_LEVEL_BROWSER:
+            UiLevelBrowser::open();
+            break;
         default:
             tms_warnf("Unhandled dialog ID: %d", num);
             break;
@@ -321,6 +324,7 @@ void ui::render() {
     UiMultiConfig::layout();
     UiOpenState::layout();
     UiOpenObject::layout();
+    UiLevelBrowser::layout();
 
     imgui_driver.post_render();
 }

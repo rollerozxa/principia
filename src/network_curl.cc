@@ -930,6 +930,54 @@ int network::download_level(void *p) {
     return T_OK;
 }
 
+int network::download_level_list(void *p) {
+    level_list_state *state = (level_list_state*)p;
+
+    state->status = request_status::Loading;
+
+    CURLcode res;
+    long http_code = 0;
+
+    char url[512];
+    snprintf(url, sizeof(url), "https://%s/api/levels", P.community_host);
+
+    struct MemoryStruct chunk = {(char *)malloc(1), 0};
+
+    lock_curl("download_level_list");
+
+    if (P.curl) {
+        init_curl_defaults(P.curl);
+        curl_easy_setopt(P.curl, CURLOPT_URL, url);
+        curl_easy_setopt(P.curl, CURLOPT_WRITEFUNCTION, write_memory_cb);
+        curl_easy_setopt(P.curl, CURLOPT_WRITEDATA, &chunk);
+        curl_easy_setopt(P.curl, CURLOPT_CONNECTTIMEOUT, 30L);
+        curl_easy_setopt(P.curl, CURLOPT_TIMEOUT, 60L);
+        res = curl_easy_perform(P.curl);
+
+        if (res != CURLE_OK) {
+            tms_errorf("download_level_list: %s", curl_easy_strerror(res));
+
+            unlock_curl("download_level_list");
+            state->status = request_status::Failed;
+            return T_OK;
+        }
+
+        curl_easy_getinfo(P.curl, CURLINFO_RESPONSE_CODE, &http_code);
+    }
+
+    unlock_curl("download_level_list");
+
+    if (http_code != 200) {
+        tms_errorf("HTTP error %ld", http_code);
+        state->status = request_status::Failed;
+        return T_OK;
+    }
+
+    parse_level_list(chunk.memory, chunk.size, *state);
+
+    return T_OK;
+}
+
 /**
  * Get the community site login token from cURL, intended for the user to be automatically
  * logged into the Android webview.

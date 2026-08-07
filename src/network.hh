@@ -1,8 +1,11 @@
 #pragma once
 
 #include "pkgman.hh"
+#include <atomic>
 #include <cstdint>
 #include <SDL3/SDL.h>
+#include <string>
+#include <vector>
 
 struct header_data {
     char *error_message;
@@ -25,6 +28,8 @@ public:
     static int register_user(void *p);
     static int download_pkg(void *p);
     static int download_level(void *p);
+
+    static int download_level_list(void *p);
 };
 
 void process_response_headers(const char *name, const char *value, header_data *hd);
@@ -79,6 +84,32 @@ struct submit_score_data {
 bool prepare_submit_score(submit_score_data *data);
 
 void handle_submit_score(header_data &hd, int http_code);
+
+enum class request_status {
+    Idle,
+    Loading,
+    Finished,
+    Failed
+};
+
+struct author_info {
+    uint32_t id;
+    std::string name;
+};
+
+struct level_info {
+    uint32_t id;
+    std::string title;
+    author_info author;
+};
+
+struct level_list_state {
+    std::atomic<request_status> status{request_status::Idle};
+
+    std::vector<level_info> levels;
+};
+
+void parse_level_list(char *buf, size_t buf_size, level_list_state &state);
 
 #ifdef SDL_PLATFORM_ANDROID
 extern "C" {

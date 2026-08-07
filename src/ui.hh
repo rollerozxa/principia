@@ -80,6 +80,7 @@
 
 #define DIALOG_PUBLISH          300
 #define DIALOG_LOGIN            301
+#define DIALOG_LEVEL_BROWSER    302
 
 #define SIGNAL_LOGIN_SUCCESS        100
 #define SIGNAL_LOGIN_FAILED         101

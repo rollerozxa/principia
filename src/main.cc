@@ -503,6 +503,10 @@ static void perform_action(int x, void *data) {
         case ACTION_PUBLISH_PKG:
             break;
 
+        case ACTION_GET_LEVEL_LIST:
+            create_thread(network::download_level_list, "_download_level_list", data);
+            break;
+
         case ACTION_PUBLISH:
             tms_debugf("action publish");
             P.s_loading_screen->load(publish_loader, G);

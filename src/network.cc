@@ -9,6 +9,7 @@
 #include "version.hh"
 #include "world.hh"
 #include <algorithm>
+#include <cjson/cJSON.h>
 #include <tms/cpp.hh>
 
 /* Publish level variables */
@@ -320,4 +321,64 @@ void handle_submit_score(header_data &hd, int http_code) {
         tms_errorf("submit score failed with http code %d", http_code);
         ui::message("An error occurred while submitting your score. Please check your internet connection and try again.", true);
     }
+}
+
+// Level browser stuff
+
+void parse_level_list(char *buf, size_t buf_size, level_list_state &state) {
+    std::vector<level_info> levels;
+
+    cJSON *root = cJSON_Parse(buf);
+
+    if (!root) {
+        tms_errorf("Invalid JSON");
+        state.status = request_status::Failed;
+        return;
+    }
+
+    cJSON *array = cJSON_GetObjectItem(root, "levels");
+
+    if (!cJSON_IsArray(array)) {
+        cJSON_Delete(root);
+        state.status = request_status::Failed;
+        return;
+    }
+
+    cJSON *item;
+
+    cJSON_ArrayForEach(item, array) {
+
+        level_info lvl;
+
+        cJSON *id = cJSON_GetObjectItem(item, "id");
+        cJSON *title = cJSON_GetObjectItem(item, "title");
+        cJSON *author = cJSON_GetObjectItem(item, "author");
+
+        if (cJSON_IsNumber(id))
+            lvl.id = id->valueint;
+
+        if (cJSON_IsString(title))
+            lvl.title = title->valuestring;
+
+        if (cJSON_IsObject(author)) {
+
+            cJSON *aid = cJSON_GetObjectItem(author, "id");
+            cJSON *aname = cJSON_GetObjectItem(author, "name");
+
+            if (cJSON_IsNumber(aid))
+                lvl.author.id = aid->valueint;
+
+            if (cJSON_IsString(aname))
+                lvl.author.name = aname->valuestring;
+        }
+
+        levels.push_back(std::move(lvl));
+    }
+
+    cJSON_Delete(root);
+
+    tms_infof("Downloaded %zu levels", levels.size());
+
+    state.levels = std::move(levels);
+    state.status = request_status::Finished;
 }
