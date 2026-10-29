@@ -28,7 +28,6 @@ jobs:
 
       - name: Install deps
         run: |
-          export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew update --auto-update
           brew install cmake ninja libpng libjpeg-turbo freetype sdl3
