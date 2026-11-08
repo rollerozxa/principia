@@ -30,16 +30,14 @@ jobs:
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew update --auto-update
-          brew install cmake ninja libpng libjpeg-turbo freetype sdl3
+          brew install cmake ninja brotli libpng libjpeg-turbo freetype sdl3
 
       - name: Compile
         run: |
           mkdir build; cd build
           cmake .. -G Ninja \
             -DCMAKE_OSX_DEPLOYMENT_TARGET=10.14 \
-            -DCMAKE_FIND_FRAMEWORK=LAST \
             -DCMAKE_INSTALL_PREFIX=../build/macos/ \
-            -DCMAKE_EXE_LINKER_FLAGS="-L/opt/homebrew/lib/" \
             -DUNITY_BUILD=ON
           ninja
 
